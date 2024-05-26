@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player with Playlist and Interactive Features</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            width: 80%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        .video-player {
+            flex: 3;
+            padding: 20px;
+            position: relative;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: auto;
+        }
+
+        .playlist {
+            flex: 1;
+            border-left: 1px solid #ccc;
+            overflow-y: auto;
+        }
+
+        .playlist-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .playlist-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .status {
+            color: green;
+            visibility: hidden;
+        }
+
+        .splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .splash-screen button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        .splash-screen button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-player">
+            <video id="video" controls>
+                <source src="video1.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="splash-screen" id="splash-screen">
+                <h2>Multiple Choice Question</h2>
+                <p>What is AI?</p>
+                <button onclick="resumeVideo()">Option 1</button>
+                <button onclick="resumeVideo()">Option 2</button>
+                <button onclick="resumeVideo()">Option 3</button>
+                <button onclick="resumeVideo()">Option 4</button>
+            </div>
+        </div>
+        <div class="playlist">
+            <div class="playlist-item" data-video="video1.mp4">
+                <span>Welcome to AI Foundations</span>
+                <span class="status">&#x2714;</span>
+            </div>
+            <div class="playlist-item" data-video="video1.mp4">
+                <span>Introduction to AI</span>
+                <span class="status">&#x2714;</span>
+            </div>
+            <div class="playlist-item" data-video="video1.mp4">
+                <span>AI - Tasks and Data</span>
+                <span class="status">&#x2714;</span>
+            </div>
+            <!-- Add more playlist items as needed -->
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video');
+            const playlistItems = document.querySelectorAll('.playlist-item');
+            const splashScreen = document.getElementById('splash-screen');
+            let currentIndex = 0;
+            let halfwayPointReached = false;
+
+            function loadVideo(index) {
+                const videoSource = playlistItems[index].getAttribute('data-video');
+                video.src = videoSource;
+                video.play();
+                halfwayPointReached = false;
+                updateStatus(index);
+            }
+
+            function updateStatus(index) {
+                playlistItems.forEach((item, i) => {
+                    const status = item.querySelector('.status');
+                    if (i <= index) {
+                        status.style.visibility = 'visible';
+                    } else {
+                        status.style.visibility = 'hidden';
+                    }
+                });
+            }
+
+            video.addEventListener('timeupdate', function() {
+                const halfwayPoint = video.duration / 2;
+                if (video.currentTime >= halfwayPoint && !halfwayPointReached) {
+                    halfwayPointReached = true;
+                    video.pause();
+                    splashScreen.style.display = 'flex';
+                }
+            });
+
+            video.addEventListener('ended', function() {
+                updateStatus(currentIndex);
+                currentIndex++;
+                if (currentIndex < playlistItems.length) {
+                    loadVideo(currentIndex);
+                }
+            });
+
+            video.addEventListener('seeking', function(event) {
+                if (video.currentTime !== video.duration && video.currentTime !== video.duration) {
+                    video.currentTime = video.startTime;
+                    alert("Heyy User You can't skip the video");
+                }
+            });
+            
+
+            playlistItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    currentIndex = index;
+                    loadVideo(currentIndex);
+                });
+            });
+
+            loadVideo(currentIndex); // Load the first video on page load
+        });
+
+        function resumeVideo() {
+            const splashScreen = document.getElementById('splash-screen');
+            splashScreen.style.display = 'none';
+            const video = document.getElementById('video');
+            video.play();
+        }
+    </script>
+</body>
+</html>
